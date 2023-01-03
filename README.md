@@ -1,10 +1,8 @@
-# mc-debug-tools
+# Minecraft Debug Tools
 
-## Minecraft Debug Tools
+Tools to make Minecraft debugging easier. Made to help add-on, map, and other Minecraft creators.
 
-Tools to make Minecraft debugging easier.
-
-### Features
+## Features
 
 - Script and function reload indication
 - TPS counter

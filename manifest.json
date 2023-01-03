@@ -1,0 +1,46 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "Debug Tools",
+		"description": "Tools for Minecraft creators to get a look into performance and make debugging easier",
+		"uuid": "18188072-1092-42e0-93a1-789fbffec70a",
+		"version": [
+			0,
+			0,
+			1
+		],
+		"min_engine_version": [
+			1,
+			19,
+			50
+		]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "232958f3-e36c-4fc1-8fa4-0db8e6eedaca",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"type": "script",
+			"language": "javascript",
+			"uuid": "49e06d65-0899-4730-9c92-d5d5072801f2",
+			"version": [
+				0,
+				0,
+				1
+			],
+			"entry": "scripts/Main.js"
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "1.1.0-beta"
+		}
+	]
+}

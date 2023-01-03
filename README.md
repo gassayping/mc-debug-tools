@@ -6,3 +6,4 @@ Tools to make Minecraft debugging easier. Made to help add-on, map, and other Mi
 
 - Script and function reload indication
 - TPS counter
+- Tracks longest tick during a lag spike

@@ -8,3 +8,6 @@ Tools to make Minecraft debugging easier. Made to help add-on, map, and other Mi
 - TPS counter
 - Tracks longest tick during a lag spike
 - Entity counter
+- Tracks script and function pack uptime
+- Toggles for all features
+- Configurable settings

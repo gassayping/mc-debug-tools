@@ -27,6 +27,22 @@ switch (m.message) {
     m.cancel = true;
     overworld.runCommandAsync(`give ${m.sender.name} ${Settings["Settings Item"]}`);
     break;
+    case '.gmc':
+    m.cancel = true;
+    overworld.runCommandAsync(`gamemode creative ${m.sender.name} `);
+    break;
+    case '.gms':
+    m.cancel = true;
+    overworld.runCommandAsync(`gamemode survival ${m.sender.name} `);
+    break;
+    case '.gma':
+    m.cancel = true;
+    overworld.runCommandAsync(`gamemode adventure ${m.sender.name} `);
+    break;
+    case '.gmsp':
+    m.cancel = true;
+    overworld.runCommandAsync(`gamemode spectator ${m.sender.name} `);
+    break;
 default: break;
 }
 });

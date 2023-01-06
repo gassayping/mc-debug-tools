@@ -85,10 +85,6 @@ function tick(t) {
             tickTotals -= tickLengths[tickLengths.length-1];
             tickLengths.pop();
         }
-        if(t.deltaTime > longestTick.tickLength || longestTick.time >= 5) {
-            longestTick.time=0;
-            longestTick.tickLength = (Math.round(t.deltaTime * 100))/100;
-        }
         if (tickLengths.length <= 5) {
             title += `TPS: §c${tickLengths.length}/20 `
         } else if(tickLengths.length < 15) {

@@ -27,19 +27,19 @@ switch (m.message) {
     m.cancel = true;
     overworld.runCommandAsync(`give ${m.sender.name} ${Settings["Settings Item"]}`);
     break;
-    case `${Settings["Command Prefix"]}.gmc`:
+    case `${Settings["Command Prefix"]}gmc`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode creative ${m.sender.name} `);
     break;
-    case `${Settings["Command Prefix"]}.gms`:
+    case `${Settings["Command Prefix"]}gms`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode survival ${m.sender.name} `);
     break;
-    case `${Settings["Command Prefix"]}.gma`:
+    case `${Settings["Command Prefix"]}gma`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode adventure ${m.sender.name} `);
     break;
-    case `${Settings["Command Prefix"]}.gmsp`:
+    case `${Settings["Command Prefix"]}gmsp`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode spectator ${m.sender.name} `);
     break;

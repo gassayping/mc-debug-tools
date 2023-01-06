@@ -1,1 +1,0 @@
-console.warn("____________________Scripts and functions reloaded!____________________");

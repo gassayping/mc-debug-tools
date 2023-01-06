@@ -1,9 +1,9 @@
-import "./ReloadScript";
-import {overworld} from "./Exports";
 import {Settings} from "./Config.js";
 import {world} from "@minecraft/server";
 import {ActionFormData} from "@minecraft/server-ui";
 
+console.warn("____________________Scripts and functions reloaded!____________________");
+const overworld = world.getDimension("overworld");
 let tickLengths = [];
 let tickTotals = 0;
 let longestTick = {tickLength: 0, time: 0};
@@ -23,23 +23,23 @@ const settingsMenu = new ActionFormData()
 
 world.events.beforeChat.subscribe(m =>{
 switch (m.message) {
-    case '.tools':
+    case `${Settings["Command Prefix"]}tools`:
     m.cancel = true;
     overworld.runCommandAsync(`give ${m.sender.name} ${Settings["Settings Item"]}`);
     break;
-    case '.gmc':
+    case `${Settings["Command Prefix"]}.gmc`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode creative ${m.sender.name} `);
     break;
-    case '.gms':
+    case `${Settings["Command Prefix"]}.gms`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode survival ${m.sender.name} `);
     break;
-    case '.gma':
+    case `${Settings["Command Prefix"]}.gma`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode adventure ${m.sender.name} `);
     break;
-    case '.gmsp':
+    case `${Settings["Command Prefix"]}.gmsp`:
     m.cancel = true;
     overworld.runCommandAsync(`gamemode spectator ${m.sender.name} `);
     break;
@@ -61,7 +61,7 @@ world.events.beforeItemUse.subscribe(event => {
 });
 world.events.playerJoin.subscribe(f => {
     if (countingPlayer == null) {
-        countingPlayer = world.getAllPlayers()[0].name;
+        try{countingPlayer = world.getAllPlayers()[0].name;} catch{}
     }
 });
 world.events.playerLeave.subscribe(f => {
@@ -73,6 +73,9 @@ world.events.playerLeave.subscribe(f => {
 world.events.tick.subscribe(e => tick(e))
 
 function tick(t) {
+    if (countingPlayer == null) {
+        try{countingPlayer = world.getAllPlayers()[0].name;} catch{}
+    }
     let title = `title @a actionbar `
     if(Settings.TPS){
         tickLengths.unshift(t.deltaTime);

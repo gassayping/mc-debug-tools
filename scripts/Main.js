@@ -115,7 +115,7 @@ function tick(t) {
             timer.firstTick = t.currentTick;
             timer.hasFirst = true;
         }
-        title += `§rScript Uptime: §b${t.currentTick-timer.firstTick} `
+        title += `§rScript Uptime: §b${(Math.round((t.currentTick-timer.firstTick)/2)/10).toFixed(1)}s `
     }
     overworld.runCommandAsync(title);
 }

@@ -14,3 +14,5 @@ Tools to make Minecraft debugging easier. Made to help add-on, map, and other Mi
 - Quick gamemode change commands: .gms, .gmc, etc
 - Toggles for all features
 - Configurable settings
+
+![Feature Demo](./preview.jpg)

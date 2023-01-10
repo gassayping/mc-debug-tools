@@ -1,3 +1,5 @@
+<img align="right" width="100" height="100" src="./src/pack_icon.png">
+
 # Minecraft Debug Tools
 
 Tools to make Minecraft debugging easier. Made to help add-on, map, and other Minecraft creators.

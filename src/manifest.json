@@ -5,9 +5,9 @@
 		"description": "Tools for Minecraft creators to get a look into performance and make debugging easier",
 		"uuid": "18188072-1092-42e0-93a1-789fbffec70a",
 		"version": [
+			1,
 			0,
-			0,
-			1
+			0
 		],
 		"min_engine_version": [
 			1,
@@ -30,9 +30,9 @@
 			"language": "javascript",
 			"uuid": "49e06d65-0899-4730-9c92-d5d5072801f2",
 			"version": [
+				1,
 				0,
-				0,
-				1
+				0
 			],
 			"entry": "scripts/Main.js"
 		}

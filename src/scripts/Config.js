@@ -1,4 +1,5 @@
 export let Settings = {
+    //Change "true" to "false" to disable modules
     "TPS": true, //Ticks Per Second
     "Longest Tick": true, //Longest tick that occurs in the last 5 seconds
     "Entity Counter": true, //Counts entities in the world

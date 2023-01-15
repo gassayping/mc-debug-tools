@@ -7,7 +7,7 @@ const overworld = world.getDimension("overworld");
 let tickLengths = [];
 let tickTotals = 0;
 let longestTick = {tickLength: 0, time: 0};
-let timer = {hasFirst: false, firstTick: 0};
+let firstTick = 0;
 let countingPlayer;
 try{countingPlayer = world.getAllPlayers()[0].name;} catch{}
 try{world.scoreboard.removeObjective("entityCounter");} catch{}
@@ -73,10 +73,7 @@ world.events.playerLeave.subscribe(f => {
 world.events.tick.subscribe(e => tick(e))
 
 function tick(t) {
-    if (countingPlayer == null) {
-        try{countingPlayer = world.getAllPlayers()[0].name;} catch{}
-    }
-    let title = `title @a actionbar `
+    let title = "title @a actionbar "
     if(Settings.TPS){
         tickLengths.unshift(t.deltaTime);
         tickTotals += t.deltaTime;
@@ -101,17 +98,19 @@ function tick(t) {
         title += `§rLongest Tick: §9${longestTick.tickLength}\n`
     }
     if(Settings["Entity Counter"]){
-        overworld.runCommandAsync(`scoreboard players set ${countingPlayer} entityCounter 0`);
+        if (countingPlayer == null) {
+            try{countingPlayer = world.getAllPlayers()[0].name;} catch{}
+        }
+        overworld.runCommandAsync(`scoreboard players reset ${countingPlayer} entityCounter`);
         overworld.runCommandAsync(`execute as @e run scoreboard players add ${countingPlayer} entityCounter 1`);
         try{var entityCount = world.scoreboard.getObjective("entityCounter").getScores()[0].score;} catch{}
         title += `§rEntities: §g${entityCount} `;
     }
     if(Settings["Script Uptime"]){
-        if(!timer.hasFirst){
-            timer.firstTick = t.currentTick;
-            timer.hasFirst = true;
+        if (!firstTick) {
+            firstTick = t.currentTick;
         }
-        title += `§rScript Uptime: §b${(Math.round((t.currentTick-timer.firstTick)/2)/10).toFixed(1)}s `
+        title += `§rScript Uptime: §b${(Math.round((t.currentTick-firstTick)/2)/10).toFixed(1)}s `
     }
     overworld.runCommandAsync(title);
 }

@@ -1,6 +1,6 @@
 import {Settings} from "./Config.js";
-import {world} from "@minecraft/server";
-import {ActionFormData} from "@minecraft/server-ui";
+import {world, DynamicPropertiesDefinition} from "@minecraft/server";
+import {ModalFormData} from "@minecraft/server-ui";
 
 console.warn("____________________Scripts and functions reloaded!____________________");
 const overworld = world.getDimension("overworld");
@@ -13,13 +13,36 @@ try{countingPlayer = world.getAllPlayers()[0].name;} catch{}
 try{world.scoreboard.removeObjective("entityCounter");} catch{}
 try{world.scoreboard.addObjective("entityCounter", "Entities");} catch{}
 
-const settingsMenu = new ActionFormData()
-    .title("Debug Settings")
-    .body("Toggle Specific Trackers\n§4WARNING§r: Will NOT save on /reload\nEdit config.js file for persistent settings")
-    .button("TPS Counter", "textures/ui/dev_glyph_color")
-    .button("Longest Tick", "textures/ui/Ping_Red")
-    .button("Entity Counter", "textures/ui/World")
-    .button("Script Uptime", "textures/ui/clock");
+world.events.worldInitialize.subscribe(eventData => {
+    let settingsSave = new DynamicPropertiesDefinition();
+        settingsSave.defineBoolean("Initialized");
+        settingsSave.defineBoolean("Debug TPS");
+        settingsSave.defineBoolean("Debug Longest Tick");
+        settingsSave.defineBoolean("Debug Entity Counter");
+        settingsSave.defineBoolean("Debug Script Uptime");
+        settingsSave.defineString("Debug Item", 36);
+        settingsSave.defineString("Debug Item Namespace", 36);
+        settingsSave.defineString("Debug Prefix", 1);
+    eventData.propertyRegistry.registerWorldDynamicProperties(settingsSave);
+    if(!world.getDynamicProperty("Initialized")){
+        world.setDynamicProperty("Initialized", true);
+        world.setDynamicProperty("Debug TPS", Settings["TPS"]);
+        world.setDynamicProperty("Debug Longest Tick", Settings["Longest Tick"]);
+        world.setDynamicProperty("Debug Entity Counter", Settings["Entity Counter"]);
+        world.setDynamicProperty("Debug Script Uptime", Settings["Script Uptime"]);
+        world.setDynamicProperty("Debug Item", Settings["Settings Item"]);
+        world.setDynamicProperty("Debug Item Namespace", Settings["Settings Item Prefix"]);
+        world.setDynamicProperty("Debug Prefix", Settings["Command Prefix"]);
+    } else {
+        Settings["TPS"] = world.getDynamicProperty("Debug TPS");
+        Settings["Longest Tick"] = world.getDynamicProperty("Debug Longest Tick");
+        Settings["Entity Counter"] = world.getDynamicProperty("Debug Entity Counter");
+        Settings["Script Uptime"] = world.getDynamicProperty("Debug Script Uptime");
+        Settings["Settings Item"] = world.getDynamicProperty("Debug Item");
+        Settings["Settings Item Prefix"] = world.getDynamicProperty("Debug Item Namespace");
+        Settings["Command Prefix"] = world.getDynamicProperty("Debug Prefix");
+    }
+})
 
 world.events.beforeChat.subscribe(m =>{
 switch (m.message) {
@@ -48,14 +71,24 @@ default: break;
 });
 world.events.beforeItemUse.subscribe(event => {
     if (event.item.typeId == Settings["Settings Item Prefix"]+Settings["Settings Item"]) {
+        const settingsMenu = new ModalFormData()
+        .title("Debug Settings")
+        .toggle("§aTPS Counter      §o§bDebug Tools", Settings["TPS"])
+        .toggle("§aLongest Tick      §o§bCreated by:", Settings["Longest Tick"])
+        .toggle("§aEntity Counter    §o§bGassayping", Settings["Entity Counter"])
+        .toggle("§aScript Uptime", Settings["Script Uptime"]);
         settingsMenu.show(event.source).then(r => {
             if (r.canceled) {return}
-            switch(r.selection){
-                case 0: Settings.TPS = !Settings.TPS; world.say("Toggled TPS Counter"); break;
-                case 1: Settings["Longest Tick"] = !Settings["Longest Tick"]; world.say("Toggled Longest Tick Tracker"); break;
-                case 2: Settings["Entity Counter"] = !Settings["Entity Counter"]; world.say("Toggled Entity Counter"); break;
-                case 3: Settings["Script Uptime"] = !Settings["Script Uptime"]; world.say("Toggled Script Uptime"); break;
-            }
+            let responses = r.formValues;
+            console.warn(r.formValues);
+            Settings.TPS = responses[0];
+                world.setDynamicProperty("Debug TPS", Settings["TPS"]);
+            Settings["Longest Tick"] = responses[1];
+                world.setDynamicProperty("Debug Longest Tick", Settings["Longest Tick"]);
+            Settings["Entity Counter"] = responses[2];
+                world.setDynamicProperty("Debug Longest Tick", Settings["Entity Counter"]);
+            Settings["Script Uptime"] = responses[3];
+                world.setDynamicProperty("Debug Longest Tick", Settings["Script Uptime"]);
         })
     }
 });
@@ -110,7 +143,7 @@ function tick(t) {
         if (!firstTick) {
             firstTick = t.currentTick;
         }
-        title += `§rScript Uptime: §b${(Math.round((t.currentTick-firstTick)/2)/10).toFixed(1)}s `
+        title += `§rScript Uptime: §b${(Math.round((t.currentTick-firstTick)/2)/10).toFixed(1)}s`
     }
     overworld.runCommandAsync(title);
 }

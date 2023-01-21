@@ -1,4 +1,4 @@
-<img align="right" width="100" height="100" src="./src/pack_icon.png">
+<img align="right" width="100" height="100" src="./src/Debug Tools/pack_icon.png">
 
 # Minecraft Debug Tools
 

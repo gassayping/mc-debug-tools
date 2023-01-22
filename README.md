@@ -16,3 +16,9 @@ Tools to make Minecraft debugging easier. Made to help add-on, map, and other Mi
 - Configurable settings
 
 ![Feature Demo](./preview.jpg)
+
+## Installation
+
+1. Download the mcpack from the latest [release](https://github.com/gassayping/mc-debug-tools/releases/) or from [MCPEDL](https://mcpedl.com/debug-tools/)
+2. Open the file in Minecraft
+3. Make sure to enable the "Beta APIs" experimental toggle when adding the pack to a world

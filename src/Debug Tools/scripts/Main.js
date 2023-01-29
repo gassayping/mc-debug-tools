@@ -4,16 +4,17 @@ import { ModalFormData } from "@minecraft/server-ui";
 
 console.warn("____________________Scripts and functions reloaded!____________________");
 const overworld = world.getDimension("overworld");
+const startTime = Date.now();
 let tickLengths = [];
 let tickTotals = 0;
 let longestTick = { tickLength: 0, time: 0, max: 5 * 20 };
-let firstTick = 0;
 
 world.events.worldInitialize.subscribe(eventData => {
 	let settingsSave = new DynamicPropertiesDefinition();
 	settingsSave.defineBoolean("Initialized");
 	settingsSave.defineBoolean("Debug TPS");
 	settingsSave.defineBoolean("Debug Longest Tick");
+	settingsSave.defineBoolean("Debug Smart Longest Tick");
 	settingsSave.defineBoolean("Debug Entity Counter");
 	settingsSave.defineBoolean("Debug Script Uptime");
 	settingsSave.defineString("Debug Item", 36);
@@ -24,6 +25,7 @@ world.events.worldInitialize.subscribe(eventData => {
 		world.setDynamicProperty("Initialized", true);
 		world.setDynamicProperty("Debug TPS", Settings["TPS"]);
 		world.setDynamicProperty("Debug Longest Tick", Settings["Longest Tick"]);
+		world.setDynamicProperty("Debug Smart Longest Tick", Settings["Smart Longest Tick"]);
 		world.setDynamicProperty("Debug Entity Counter", Settings["Entity Counter"]);
 		world.setDynamicProperty("Debug Script Uptime", Settings["Script Uptime"]);
 		world.setDynamicProperty("Debug Item", Settings["Settings Item"]);
@@ -32,6 +34,7 @@ world.events.worldInitialize.subscribe(eventData => {
 	} else {
 		Settings["TPS"] = world.getDynamicProperty("Debug TPS");
 		Settings["Longest Tick"] = world.getDynamicProperty("Debug Longest Tick");
+		Settings["Smart Longest Tick"] = world.getDynamicProperty("Debug Smart Longest Tick");
 		Settings["Entity Counter"] = world.getDynamicProperty("Debug Entity Counter");
 		Settings["Script Uptime"] = world.getDynamicProperty("Debug Script Uptime");
 		Settings["Settings Item"] = world.getDynamicProperty("Debug Item");
@@ -72,7 +75,8 @@ world.events.beforeItemUse.subscribe(event => {
 			.title("Debug Settings")
 			.toggle("§aTPS Counter      §o§bDebug Tools", Settings["TPS"])
 			.toggle("§aLongest Tick      §o§bCreated by:", Settings["Longest Tick"])
-			.toggle("§aEntity Counter    §o§bGassayping", Settings["Entity Counter"])
+			.toggle("§aSmart Tick         §o§bGassayping", Settings["Smart Longest Tick"])
+			.toggle("§aEntity Counter", Settings["Entity Counter"])
 			.toggle("§aScript Uptime", Settings["Script Uptime"]);
 		settingsMenu.show(event.source).then(r => {
 			if (r.canceled) { return }
@@ -81,9 +85,11 @@ world.events.beforeItemUse.subscribe(event => {
 			world.setDynamicProperty("Debug TPS", Settings["TPS"]);
 			Settings["Longest Tick"] = responses[1];
 			world.setDynamicProperty("Debug Longest Tick", Settings["Longest Tick"]);
-			Settings["Entity Counter"] = responses[2];
+			Settings["Smart Longest Tick"] = responses[2];
+			world.setDynamicProperty("Debug Smart Longest Tick", Settings["Smart Longest Tick"]);
+			Settings["Entity Counter"] = responses[3];
 			world.setDynamicProperty("Debug Longest Tick", Settings["Entity Counter"]);
-			Settings["Script Uptime"] = responses[3];
+			Settings["Script Uptime"] = responses[4];
 			world.setDynamicProperty("Debug Longest Tick", Settings["Script Uptime"]);
 		})
 	}
@@ -108,23 +114,27 @@ function tick(t) {
 			title += `TPS: §2${tickLengths.length}/20 `
 		}
 	}
-	if (Settings["Longest Tick"]) {
+	if (Settings["Longest Tick"] || Settings["Smart Longest Tick"]) {
 		longestTick.time += 1;
 		if (t.deltaTime > longestTick.tickLength || longestTick.time == longestTick.max) {
 			longestTick.time = 0;
-			longestTick.tickLength = (Math.round(t.deltaTime * 100)) / 100;
+			longestTick.tickLength = t.deltaTime.toFixed(2);
 		}
-		title += `§rLongest Tick: §9${longestTick.tickLength}\n`
+		if (Settings["Smart Longest Tick"]) {
+			if (longestTick.tickLength >= 0.1) {
+				title += `§rLongest Tick: §9${longestTick.tickLength}\n`
+			}
+		} else {
+			title += `§rLongest Tick: §9${longestTick.tickLength}\n`
+		}
 	}
 	if (Settings["Entity Counter"]) {
 		const entityCount = Array.from(overworld.getEntities()).length
 		title += `§rEntities: §g${entityCount} `;
 	}
 	if (Settings["Script Uptime"]) {
-		if (!firstTick) {
-			firstTick = t.currentTick;
-		}
-		title += `§rScript Uptime: §b${(Math.round((t.currentTick - firstTick) / 2) / 10).toFixed(1)}s`
+		const uptime = ((Date.now() - startTime) / 1000).toFixed(1);
+		title += `§rScript Uptime: §b${uptime}s`
 	}
 	overworld.runCommandAsync(title);
 }

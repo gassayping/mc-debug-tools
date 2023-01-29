@@ -6,7 +6,7 @@ console.warn("____________________Scripts and functions reloaded!_______________
 const overworld = world.getDimension("overworld");
 let tickLengths = [];
 let tickTotals = 0;
-let longestTick = { tickLength: 0, time: 0 };
+let longestTick = { tickLength: 0, time: 0, max: 5 * 20 };
 let firstTick = 0;
 
 world.events.worldInitialize.subscribe(eventData => {
@@ -41,26 +41,27 @@ world.events.worldInitialize.subscribe(eventData => {
 })
 
 world.events.beforeChat.subscribe(m => {
+	const player = m.sender.name
 	switch (m.message) {
 		case `${Settings["Command Prefix"]}tools`:
 			m.cancel = true;
-			overworld.runCommandAsync(`give ${m.sender.name} ${Settings["Settings Item"]}`);
+			overworld.runCommandAsync(`give ${player} ${Settings["Settings Item"]}`);
 			break;
 		case `${Settings["Command Prefix"]}gmc`:
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode creative ${m.sender.name} `);
+			overworld.runCommandAsync(`gamemode creative ${player} `);
 			break;
 		case `${Settings["Command Prefix"]}gms`:
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode survival ${m.sender.name} `);
+			overworld.runCommandAsync(`gamemode survival ${player} `);
 			break;
 		case `${Settings["Command Prefix"]}gma`:
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode adventure ${m.sender.name} `);
+			overworld.runCommandAsync(`gamemode adventure ${player} `);
 			break;
 		case `${Settings["Command Prefix"]}gmsp`:
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode spectator ${m.sender.name} `);
+			overworld.runCommandAsync(`gamemode spectator ${player} `);
 			break;
 		default: break;
 	}
@@ -75,7 +76,7 @@ world.events.beforeItemUse.subscribe(event => {
 			.toggle("§aScript Uptime", Settings["Script Uptime"]);
 		settingsMenu.show(event.source).then(r => {
 			if (r.canceled) { return }
-			let responses = r.formValues;
+			const responses = r.formValues;
 			Settings.TPS = responses[0];
 			world.setDynamicProperty("Debug TPS", Settings["TPS"]);
 			Settings["Longest Tick"] = responses[1];
@@ -109,14 +110,15 @@ function tick(t) {
 	}
 	if (Settings["Longest Tick"]) {
 		longestTick.time += 1;
-		if (t.deltaTime > longestTick.tickLength || longestTick.time == 100) {
+		if (t.deltaTime > longestTick.tickLength || longestTick.time == longestTick.max) {
 			longestTick.time = 0;
 			longestTick.tickLength = (Math.round(t.deltaTime * 100)) / 100;
 		}
 		title += `§rLongest Tick: §9${longestTick.tickLength}\n`
 	}
 	if (Settings["Entity Counter"]) {
-		title += `§rEntities: §g${Array.from(overworld.getEntities()).length} `;
+		const entityCount = Array.from(overworld.getEntities()).length
+		title += `§rEntities: §g${entityCount} `;
 	}
 	if (Settings["Script Uptime"]) {
 		if (!firstTick) {

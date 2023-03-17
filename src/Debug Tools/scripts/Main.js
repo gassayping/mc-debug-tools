@@ -1,13 +1,18 @@
 import { Settings } from "./Config.js";
-import { world, DynamicPropertiesDefinition } from "@minecraft/server";
+import { world, DynamicPropertiesDefinition, system } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 
 console.warn("____________________Scripts and functions reloaded!____________________");
 const overworld = world.getDimension("overworld");
 const startTime = Date.now();
+let lastTick = Date.now();
 let tickLengths = [];
 let tickTotals = 0;
-let longestTick = { tickLength: 0, time: 0, max: 5 * 20 };
+let longestTick = {
+	tickLength: 0,
+	time: 0,
+	max: 5 * 20
+};
 
 world.events.worldInitialize.subscribe(eventData => {
 	let settingsSave = new DynamicPropertiesDefinition();
@@ -95,13 +100,15 @@ world.events.beforeItemUse.subscribe(event => {
 	}
 });
 
-world.events.tick.subscribe(e => tick(e))
+system.runInterval(() => tick());
 
-function tick(t) {
+function tick() {
+	const now = Date.now();
+	const deltaTime = (now - lastTick) / 1000;
 	let title = "title @a actionbar "
 	if (Settings.TPS) {
-		tickLengths.unshift(t.deltaTime);
-		tickTotals += t.deltaTime;
+		tickLengths.unshift(deltaTime);
+		tickTotals += deltaTime;
 		while (tickTotals > 1) {
 			tickTotals -= tickLengths[tickLengths.length - 1];
 			tickLengths.pop();
@@ -116,9 +123,9 @@ function tick(t) {
 	}
 	if (Settings["Longest Tick"] || Settings["Smart Longest Tick"]) {
 		longestTick.time += 1;
-		if (t.deltaTime > longestTick.tickLength || longestTick.time == longestTick.max) {
+		if (deltaTime > longestTick.tickLength || longestTick.time == longestTick.max) {
 			longestTick.time = 0;
-			longestTick.tickLength = t.deltaTime.toFixed(2);
+			longestTick.tickLength = parseFloat(deltaTime.toFixed(2));
 		}
 		if (Settings["Smart Longest Tick"]) {
 			if (longestTick.tickLength >= 0.1) {
@@ -133,8 +140,9 @@ function tick(t) {
 		title += `§rEntities: §g${entityCount} `;
 	}
 	if (Settings["Script Uptime"]) {
-		const uptime = ((Date.now() - startTime) / 1000).toFixed(1);
+		const uptime = ((now - startTime) / 1000).toFixed(1);
 		title += `§rScript Uptime: §b${uptime}s`
 	}
+	lastTick = now;
 	overworld.runCommandAsync(title);
 }

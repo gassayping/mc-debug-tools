@@ -1,6 +1,8 @@
+//@ts-expect-error
 import { Settings } from './Config.js';
-import { world, DynamicPropertiesDefinition, system, ItemStack } from '@minecraft/server';
+import { world, DynamicPropertiesDefinition, system, ItemStack, Vector, Player } from '@minecraft/server';
 import { ModalFormData } from '@minecraft/server-ui';
+
 console.warn('___Scripts and functions reloaded!___');
 const overworld = world.getDimension('overworld');
 const startTime = Date.now();
@@ -17,6 +19,7 @@ const entityChange = {
 	delta: 0,
 	timeout: 20
 };
+
 world.afterEvents.worldInitialize.subscribe(eventData => {
 	let settingsSave = new DynamicPropertiesDefinition();
 	settingsSave.defineBoolean('Initialized');
@@ -41,8 +44,7 @@ world.afterEvents.worldInitialize.subscribe(eventData => {
 		world.setDynamicProperty('Debug Item', Settings['Settings Item']);
 		world.setDynamicProperty('Debug Item Namespace', Settings['Settings Item Prefix']);
 		world.setDynamicProperty('Debug Prefix', Settings['Command Prefix']);
-	}
-	else {
+	} else {
 		Settings.TPS = world.getDynamicProperty('Debug TPS');
 		Settings['Longest Tick'] = world.getDynamicProperty('Debug Longest Tick');
 		Settings['Smart Longest Tick'] = world.getDynamicProperty('Debug Smart Longest Tick');
@@ -53,15 +55,16 @@ world.afterEvents.worldInitialize.subscribe(eventData => {
 		Settings['Settings Item Prefix'] = world.getDynamicProperty('Debug Item Namespace');
 		Settings['Command Prefix'] = world.getDynamicProperty('Debug Prefix');
 	}
-});
+})
+
 world.beforeEvents.chatSend.subscribe(m => {
-	const player = m.sender;
-	if (!m.message.startsWith(Settings['Command Prefix']))
-		return;
+	const player = m.sender
+	if (!m.message.startsWith(Settings['Command Prefix'])) return;
 	const cmd = m.message.substring(Settings['Command Prefix'].length);
 	switch (cmd) {
 		case 'tools':
 			m.cancel = true;
+			//@ts-ignore
 			player.getComponent('inventory').container.addItem(new ItemStack(Settings['Settings Item']));
 			break;
 		case 'gmc':
@@ -99,9 +102,8 @@ world.afterEvents.itemUse.subscribe(event => {
 			.toggle('§aEntity Counter', Settings['Entity Counter'])
 			.toggle('§aEntity Change', Settings['Entity Change'])
 			.toggle('§aScript Uptime', Settings['Script Uptime']);
-		settingsMenu.show(event.source).then(r => {
-			if (r.canceled)
-				return;
+		settingsMenu.show(event.source as Player).then(r => {
+			if (r.canceled) return;
 			const responses = r.formValues;
 			Settings.TPS = responses[0];
 			world.setDynamicProperty('Debug TPS', Settings.TPS);
@@ -115,10 +117,12 @@ world.afterEvents.itemUse.subscribe(event => {
 			world.setDynamicProperty('Debug Entity Change', Settings['Entity Change']);
 			Settings['Script Uptime'] = responses[5];
 			world.setDynamicProperty('Debug Script Uptime', Settings['Script Uptime']);
-		});
+		})
 	}
 });
+
 system.runInterval(() => tick());
+
 function tick() {
 	const now = Date.now();
 	const deltaTime = (now - lastTick) / 1000;
@@ -130,12 +134,9 @@ function tick() {
 			tickTotals -= tickLengths[tickLengths.length - 1];
 			tickLengths.pop();
 		}
-		if (tickLengths.length <= 5)
-			titleArr.push(`TPS: §c${tickLengths.length}/20`);
-		else if (tickLengths.length < 15)
-			titleArr.push(`TPS: §e${tickLengths.length}/20`);
-		else
-			titleArr.push(`TPS: §2${tickLengths.length}/20`);
+		if (tickLengths.length <= 5) titleArr.push(`TPS: §c${tickLengths.length}/20`);
+		else if (tickLengths.length < 15) titleArr.push(`TPS: §e${tickLengths.length}/20`);
+		else titleArr.push(`TPS: §2${tickLengths.length}/20`);
 	}
 	if (Settings['Longest Tick'] || Settings['Smart Longest Tick']) {
 		const shouldChange = deltaTime > longestTick.tickLength || ++longestTick.time == longestTick.max;
@@ -144,14 +145,13 @@ function tick() {
 			longestTick.tickLength = parseFloat(deltaTime.toFixed(2));
 		}
 		if (Settings['Smart Longest Tick']) {
-			if (longestTick.tickLength >= 0.1)
-				titleArr.push(`§rLongest Tick: §9${longestTick.tickLength}`);
-		}
-		else
-			titleArr.push(`§rLongest Tick: §9${longestTick.tickLength}`);
+			if (longestTick.tickLength >= 0.1) titleArr.push(`§rLongest Tick: §9${longestTick.tickLength}`);
+		} else titleArr.push(`§rLongest Tick: §9${longestTick.tickLength}`);
 	}
 	if (Settings['Entity Counter'] || Settings['Entity Change']) {
-		const entityCount = overworld.getEntities().length;
+		const entityCount = overworld.getEntities().length
+
+
 		if (entityCount !== entityChange.last && Settings['Entity Change']) {
 			const delta = entityCount - entityChange.last;
 			entityChange.delta += delta;
@@ -160,6 +160,7 @@ function tick() {
 				entityChange.delta -= delta;
 			}, entityChange.timeout);
 		}
+
 		titleArr.push(`§rEntities: §g${entityCount}${(entityChange.delta !== 0) ? ` (${((entityChange.delta > 0) ? '+' : '') + entityChange.delta})` : ''}`);
 	}
 	if (Settings['Script Uptime']) {

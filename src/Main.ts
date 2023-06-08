@@ -1,7 +1,7 @@
 //@ts-expect-error
 import { Settings } from './Config.js';
-import { world, DynamicPropertiesDefinition, system, ItemStack, Vector, Player } from '@minecraft/server';
-import { ModalFormData } from '@minecraft/server-ui';
+import { world, DynamicPropertiesDefinition, system, ItemStack, Player } from '@minecraft/server';
+import { ActionFormData, ActionFormResponse, ModalFormData } from '@minecraft/server-ui';
 
 console.warn('___Scripts and functions reloaded!___');
 const overworld = world.getDimension('overworld');
@@ -21,17 +21,17 @@ const entityChange = {
 };
 
 world.afterEvents.worldInitialize.subscribe(eventData => {
-	let settingsSave = new DynamicPropertiesDefinition();
-	settingsSave.defineBoolean('Initialized');
-	settingsSave.defineBoolean('Debug TPS');
-	settingsSave.defineBoolean('Debug Longest Tick');
-	settingsSave.defineBoolean('Debug Smart Longest Tick');
-	settingsSave.defineBoolean('Debug Entity Counter');
-	settingsSave.defineBoolean('Debug Entity Change');
-	settingsSave.defineBoolean('Debug Script Uptime');
-	settingsSave.defineString('Debug Item', 36);
-	settingsSave.defineString('Debug Item Namespace', 36);
-	settingsSave.defineString('Debug Prefix', 1);
+	const settingsSave = new DynamicPropertiesDefinition()
+		.defineBoolean('Initialized')
+		.defineBoolean('Debug Longest Tick')
+		.defineBoolean('Debug TPS')
+		.defineBoolean('Debug Smart Longest Tick')
+		.defineBoolean('Debug Entity Counter')
+		.defineBoolean('Debug Entity Change')
+		.defineBoolean('Debug Script Uptime')
+		.defineString('Debug Settings Item', 36)
+		.defineString('Debug Settings Item Prefix', 36)
+		.defineString('Debug Command Prefix', 1);
 	eventData.propertyRegistry.registerWorldDynamicProperties(settingsSave);
 	if (!world.getDynamicProperty('Initialized')) {
 		world.setDynamicProperty('Initialized', true);
@@ -41,9 +41,8 @@ world.afterEvents.worldInitialize.subscribe(eventData => {
 		world.setDynamicProperty('Debug Entity Counter', Settings['Entity Counter']);
 		world.setDynamicProperty('Debug Entity Change', Settings['Entity Change']);
 		world.setDynamicProperty('Debug Script Uptime', Settings['Script Uptime']);
-		world.setDynamicProperty('Debug Item', Settings['Settings Item']);
-		world.setDynamicProperty('Debug Item Namespace', Settings['Settings Item Prefix']);
-		world.setDynamicProperty('Debug Prefix', Settings['Command Prefix']);
+		world.setDynamicProperty('Debug Settings Item', Settings['Settings Item']);
+		world.setDynamicProperty('Debug Command Prefix', Settings['Command Prefix']);
 	} else {
 		Settings.TPS = world.getDynamicProperty('Debug TPS');
 		Settings['Longest Tick'] = world.getDynamicProperty('Debug Longest Tick');
@@ -51,9 +50,8 @@ world.afterEvents.worldInitialize.subscribe(eventData => {
 		Settings['Entity Counter'] = world.getDynamicProperty('Debug Entity Counter');
 		Settings['Entity Change'] = world.getDynamicProperty('Debug Entity Change');
 		Settings['Script Uptime'] = world.getDynamicProperty('Debug Script Uptime');
-		Settings['Settings Item'] = world.getDynamicProperty('Debug Item');
-		Settings['Settings Item Prefix'] = world.getDynamicProperty('Debug Item Namespace');
-		Settings['Command Prefix'] = world.getDynamicProperty('Debug Prefix');
+		Settings['Settings Item'] = world.getDynamicProperty('Debug Settings Item');
+		Settings['Command Prefix'] = world.getDynamicProperty('Debug Command Prefix');
 	}
 })
 
@@ -64,24 +62,26 @@ world.beforeEvents.chatSend.subscribe(m => {
 	switch (cmd) {
 		case 'tools':
 			m.cancel = true;
-			//@ts-ignore
-			player.getComponent('inventory').container.addItem(new ItemStack(Settings['Settings Item']));
+			system.run(() => {
+				//@ts-ignore
+				player.getComponent('inventory').container.addItem(new ItemStack(Settings['Settings Item']));
+			})
 			break;
 		case 'gmc':
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode creative ${player.name} `);
+			player.runCommandAsync(`gamemode creative @s`);
 			break;
 		case 'gms':
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode survival ${player.name} `);
+			player.runCommandAsync(`gamemode survival @s`);
 			break;
 		case 'gma':
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode adventure ${player.name} `);
+			player.runCommandAsync(`gamemode adventure @s`);
 			break;
 		case 'gmsp':
 			m.cancel = true;
-			overworld.runCommandAsync(`gamemode spectator ${player.name} `);
+			player.runCommandAsync(`gamemode spectator @s`);
 			break;
 		case 'tags':
 			m.cancel = true;
@@ -93,32 +93,29 @@ world.beforeEvents.chatSend.subscribe(m => {
 	}
 });
 world.afterEvents.itemUse.subscribe(event => {
-	if (event.itemStack.typeId === Settings['Settings Item Prefix'] + Settings['Settings Item']) {
-		const settingsMenu = new ModalFormData()
-			.title('Debug Settings')
-			.toggle('§aTPS Counter      §o§bDebug Tools', Settings.TPS)
-			.toggle('§aLongest Tick      §o§bCreated by:', Settings['Longest Tick'])
-			.toggle('§aSmart Tick         §o§bGassayping', Settings['Smart Longest Tick'])
-			.toggle('§aEntity Counter', Settings['Entity Counter'])
-			.toggle('§aEntity Change', Settings['Entity Change'])
-			.toggle('§aScript Uptime', Settings['Script Uptime']);
-		settingsMenu.show(event.source as Player).then(r => {
-			if (r.canceled) return;
-			const responses = r.formValues;
-			Settings.TPS = responses[0];
-			world.setDynamicProperty('Debug TPS', Settings.TPS);
-			Settings['Longest Tick'] = responses[1];
-			world.setDynamicProperty('Debug Longest Tick', Settings['Longest Tick']);
-			Settings['Smart Longest Tick'] = responses[2];
-			world.setDynamicProperty('Debug Smart Longest Tick', Settings['Smart Longest Tick']);
-			Settings['Entity Counter'] = responses[3];
-			world.setDynamicProperty('Debug Entity Counter', Settings['Entity Counter']);
-			Settings['Entity Change'] = responses[4];
-			world.setDynamicProperty('Debug Entity Change', Settings['Entity Change']);
-			Settings['Script Uptime'] = responses[5];
-			world.setDynamicProperty('Debug Script Uptime', Settings['Script Uptime']);
+	if (event.itemStack.typeId !== Settings['Settings Item']) return;
+	const player = event.source as Player
+	new ActionFormData()
+		.title('Debug Tools')
+		.body('§bCreated by Gassayping')
+		.button('Performance', 'textures/ui/Ping_Green')
+		.button('Entities', 'textures/ui/icon_multiplayer')
+		.button('Settings', 'textures/ui/gear')
+		.show(player).then((result: ActionFormResponse) => {
+			if (result.canceled) return;
+			switch (result.selection) {
+				case 0:
+					performanceSettings(player);
+					break;
+				case 1:
+					entitySettings(player);
+					break;
+				case 2:
+					configSettings(player);
+					break;
+				default: break;
+			}
 		})
-	}
 });
 
 system.runInterval(() => tick());
@@ -131,8 +128,7 @@ function tick() {
 		tickLengths.unshift(deltaTime);
 		tickTotals += deltaTime;
 		while (tickTotals > 1) {
-			tickTotals -= tickLengths[tickLengths.length - 1];
-			tickLengths.pop();
+			tickTotals -= tickLengths.pop();
 		}
 		if (tickLengths.length <= 5) titleArr.push(`TPS: §c${tickLengths.length}/20`);
 		else if (tickLengths.length < 15) titleArr.push(`TPS: §e${tickLengths.length}/20`);
@@ -150,7 +146,6 @@ function tick() {
 	}
 	if (Settings['Entity Counter'] || Settings['Entity Change']) {
 		const entityCount = overworld.getEntities().length
-
 
 		if (entityCount !== entityChange.last && Settings['Entity Change']) {
 			const delta = entityCount - entityChange.last;
@@ -172,4 +167,54 @@ function tick() {
 	for (const player of world.getAllPlayers()) {
 		player.onScreenDisplay.setActionBar(titleArr.join(' '));
 	}
+}
+
+function performanceSettings(player: Player) {
+	new ModalFormData()
+		.title('Ticks Settings')
+		.toggle('§aTPS Counter', Settings.TPS)
+		.toggle('§aLongest Tick', Settings['Longest Tick'])
+		.toggle('§aSmart Tick', Settings['Smart Longest Tick'])
+		.toggle('§aScript Uptime', Settings['Script Uptime'])
+		.show(player).then(r => {
+			if (r.canceled) return;
+			const responses = r.formValues;
+			Settings.TPS = responses[0];
+			world.setDynamicProperty('Debug TPS', Settings.TPS);
+			Settings['Longest Tick'] = responses[1];
+			world.setDynamicProperty('Debug Longest Tick', Settings['Longest Tick']);
+			Settings['Smart Longest Tick'] = responses[2];
+			world.setDynamicProperty('Debug Smart Longest Tick', Settings['Smart Longest Tick']);
+			Settings['Script Uptime'] = responses[3];
+			world.setDynamicProperty('Debug Script Uptime', Settings['Script Uptime']);
+		})
+}
+
+function entitySettings(player: Player) {
+	new ModalFormData()
+		.title('Entity Settings')
+		.toggle('Entity Counter', Settings['Entity Counter'])
+		.toggle('Entity Change', Settings['Entity Change'])
+		.show(player).then(r => {
+			if (r.canceled) return;
+			const responses = r.formValues;
+			Settings['Entity Counter'] = responses[0];
+			world.setDynamicProperty('Debug Entity Counter', Settings['Entity Counter']);
+			Settings['Entity Change'] = responses[1];
+			world.setDynamicProperty('Debug Entity Change', Settings['Entity Change']);
+		})
+}
+function configSettings(player: Player) {
+	new ModalFormData()
+		.title('Config Settings')
+		.textField('Menu Item', 'eg: minecraft: compass', Settings['Settings Item'])
+		.textField('Custom Command Prefix', 'eg: .', Settings['Command Prefix'])
+		.show(player).then(r => {
+			if (r.canceled) return;
+			const responses = r.formValues;
+			Settings['Settings Item'] = responses[0];
+			world.setDynamicProperty('Debug Settings Item', Settings['Settings Item']);
+			Settings['Command Prefix'] = responses[1];
+			world.setDynamicProperty('Debug Command Prefix', Settings['Command Prefix']);
+		})
 }

@@ -1,92 +1,109 @@
 {
-  "namespace": "content_log",
-
-  "content_log_label": {
-    "type": "label",
-    "layer": 31,
-    "text": "#text",
-    "font_type": "smooth",
-	"font_size": "normal",
-    "shadow": true,
-    "localize": false,
-    "color": "$chat_text_color",
-    "anims": [
-      "@content_log.anim_content_log_txt_wait"
-    ],
-    "bindings": [
-      {
-        "binding_name": "#content_log_text",
-        "binding_name_override": "#text",
-        "binding_type": "collection",
-        "binding_collection_name": "content_log_text_grid",
-        "binding_condition": "once"
-      }
-    ]
-  },
-
-  "content_log_grid_item": {
-    "type": "panel",
-    "layer": 1,
-    "size": [ "100%-2px", "100%c" ],
-    "anchor_from": "top_right",
-    "anchor_to": "top_right",
-    "controls": [
-      {
-        "content_log_background": {
-          "type": "image",
-          "texture": "textures/ui/Black",
-          "alpha": 0.35,
-          "size": [ "100%", "100%c" ],
-          "anims": [
-            "@content_log.anim_content_log_bg_wait"
-          ],
-          "controls": [
-            {
-              "content_log_text@content_log_label": {
-                "anchor_from": "top_right",
-                "anchor_to": "top_right",
-                "offset": [ 0, 0 ]
-              }
-            }
-          ]
-        }
-      }
-    ]
-  },
-
-  "content_log_panel": {
-    "type": "panel",
-    "anchor_from": "top_right",
-    "anchor_to": "top_right",
-    "size": [ "50%", "100%c" ],
-    "max_size": [ "100%", "60%" ],
-    "variables": [
-		{
-			"requires": "(not $touch)",
-			"$offset": [0, "1%"]
-		},
-		{
-			"requires": "$touch",
-			"$offset": [0, "6%"]
-		}
-    ],
-    "offset": "$offset",
-
-    "controls": [
-      {
-        "stack_panel": {
-          "type": "stack_panel",
-          "anchor_from": "bottom_left",
-          "anchor_to": "bottom_left",
-          "factory": {
-            "name": "content_log_item_factory",
-            "max_children_size": 50,
-            "control_ids": {
-              "content_log_item": "content_log_item@content_log.content_log_grid_item"
-            }
-          }
-        }
-      }
-    ]
-  }
+	"namespace": "content_log",
+	"content_log_label": {
+		"type": "label",
+		"layer": 31,
+		"text": "#text",
+		"font_type": "smooth",
+		"font_size": "normal",
+		"shadow": true,
+		"localize": false,
+		"color": "$chat_text_color",
+		"anims": [
+			"@content_log.anim_content_log_txt_wait"
+		],
+		"bindings": [
+			{
+				"binding_name": "#content_log_text",
+				"binding_name_override": "#text",
+				"binding_type": "collection",
+				"binding_collection_name": "content_log_text_grid",
+				"binding_condition": "once"
+			}
+		]
+	},
+	"content_log_grid_item": {
+		"type": "panel",
+		"layer": 1,
+		"size": [
+			"100%-2px",
+			"100%c"
+		],
+		"anchor_from": "top_right",
+		"anchor_to": "top_right",
+		"controls": [
+			{
+				"content_log_background": {
+					"type": "image",
+					"texture": "textures/ui/Black",
+					"alpha": 0.35,
+					"size": [
+						"100%",
+						"100%c"
+					],
+					"anims": [
+						"@content_log.anim_content_log_bg_wait"
+					],
+					"controls": [
+						{
+							"content_log_text@content_log_label": {
+								"anchor_from": "top_right",
+								"anchor_to": "top_right",
+								"offset": [
+									0,
+									0
+								]
+							}
+						}
+					]
+				}
+			}
+		]
+	},
+	"content_log_panel": {
+		"type": "panel",
+		"anchor_from": "top_right",
+		"anchor_to": "top_right",
+		"size": [
+			"50%",
+			"100%c"
+		],
+		"max_size": [
+			"100%",
+			"60%"
+		],
+		"variables": [
+			{
+				"requires": "(not $touch)",
+				"$offset": [
+					0,
+					"1%"
+				]
+			},
+			{
+				"requires": "$touch",
+				"$offset": [
+					0,
+					"6%"
+				]
+			}
+		],
+		"offset": "$offset",
+		"controls": [
+			{
+				"stack_panel": {
+					"type": "stack_panel",
+					"anchor_from": "bottom_left",
+					"anchor_to": "bottom_left",
+					"factory": {
+						"name": "content_log_item_factory",
+						"max_children_size": 50,
+						"control_ids": {
+							"content_log_item": "content_log_item@content_log.content_log_grid_item"
+						}
+					}
+				}
+			}
+		]
+	}
 }

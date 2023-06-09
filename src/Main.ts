@@ -33,7 +33,7 @@ world.afterEvents.worldInitialize.subscribe(eventData => {
 		.defineString('DBGTLS Settings Item Prefix', 36)
 		.defineString('DBGTLS Command Prefix', 2);
 	eventData.propertyRegistry.registerWorldDynamicProperties(settingsSave);
-	if (world.getDynamicProperty('DBGTLS Initialized')) {
+	if (!world.getDynamicProperty('DBGTLS Initialized')) {
 		world.setDynamicProperty('DBGTLS Initialized', true);
 		for (const setting of Object.getOwnPropertyNames(Settings)) {
 			world.setDynamicProperty(`DBGTLS ${setting}`, Settings[setting]);
@@ -189,8 +189,8 @@ function performanceSettings(player: Player) {
 function entitySettings(player: Player) {
 	new ModalFormData()
 		.title('Entity Settings')
-		.toggle('Entity Counter', Settings['Entity Counter'])
-		.toggle('Entity Change', Settings['Entity Change'])
+		.toggle('§aEntity Counter', Settings['Entity Counter'])
+		.toggle('§aEntity Change', Settings['Entity Change'])
 		.show(player).then(r => {
 			if (r.canceled) return;
 			const responses = r.formValues;

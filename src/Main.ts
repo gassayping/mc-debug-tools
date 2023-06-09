@@ -22,36 +22,26 @@ const entityChange = {
 
 world.afterEvents.worldInitialize.subscribe(eventData => {
 	const settingsSave = new DynamicPropertiesDefinition()
-		.defineBoolean('Initialized')
-		.defineBoolean('Debug Longest Tick')
-		.defineBoolean('Debug TPS')
-		.defineBoolean('Debug Smart Longest Tick')
-		.defineBoolean('Debug Entity Counter')
-		.defineBoolean('Debug Entity Change')
-		.defineBoolean('Debug Script Uptime')
-		.defineString('Debug Settings Item', 36)
-		.defineString('Debug Settings Item Prefix', 36)
-		.defineString('Debug Command Prefix', 1);
+		.defineBoolean('DBGTLS Initialized')
+		.defineBoolean('DBGTLS Longest Tick')
+		.defineBoolean('DBGTLS TPS')
+		.defineBoolean('DBGTLS Smart Longest Tick')
+		.defineBoolean('DBGTLS Entity Counter')
+		.defineBoolean('DBGTLS Entity Change')
+		.defineBoolean('DBGTLS Script Uptime')
+		.defineString('DBGTLS Settings Item', 36)
+		.defineString('DBGTLS Settings Item Prefix', 36)
+		.defineString('DBGTLS Command Prefix', 2);
 	eventData.propertyRegistry.registerWorldDynamicProperties(settingsSave);
-	if (!world.getDynamicProperty('Initialized')) {
-		world.setDynamicProperty('Initialized', true);
-		world.setDynamicProperty('Debug TPS', Settings.TPS);
-		world.setDynamicProperty('Debug Longest Tick', Settings['Longest Tick']);
-		world.setDynamicProperty('Debug Smart Longest Tick', Settings['Smart Longest Tick']);
-		world.setDynamicProperty('Debug Entity Counter', Settings['Entity Counter']);
-		world.setDynamicProperty('Debug Entity Change', Settings['Entity Change']);
-		world.setDynamicProperty('Debug Script Uptime', Settings['Script Uptime']);
-		world.setDynamicProperty('Debug Settings Item', Settings['Settings Item']);
-		world.setDynamicProperty('Debug Command Prefix', Settings['Command Prefix']);
+	if (!world.getDynamicProperty('DBGTLS Initialized')) {
+		world.setDynamicProperty('DBGTLS Initialized', true);
+		for (const setting of Object.getOwnPropertyNames(Settings)) {
+			world.setDynamicProperty(`DBGTLS ${setting}`, Settings[setting]);
+		}
 	} else {
-		Settings.TPS = world.getDynamicProperty('Debug TPS');
-		Settings['Longest Tick'] = world.getDynamicProperty('Debug Longest Tick');
-		Settings['Smart Longest Tick'] = world.getDynamicProperty('Debug Smart Longest Tick');
-		Settings['Entity Counter'] = world.getDynamicProperty('Debug Entity Counter');
-		Settings['Entity Change'] = world.getDynamicProperty('Debug Entity Change');
-		Settings['Script Uptime'] = world.getDynamicProperty('Debug Script Uptime');
-		Settings['Settings Item'] = world.getDynamicProperty('Debug Settings Item');
-		Settings['Command Prefix'] = world.getDynamicProperty('Debug Command Prefix');
+		for (const setting of Object.getOwnPropertyNames(Settings)) {
+			Settings[setting] = world.getDynamicProperty(`DBGTLS ${setting}`);
+		}
 	}
 })
 
@@ -180,13 +170,13 @@ function performanceSettings(player: Player) {
 			if (r.canceled) return;
 			const responses = r.formValues;
 			Settings.TPS = responses[0];
-			world.setDynamicProperty('Debug TPS', Settings.TPS);
+			world.setDynamicProperty('DBGTLS TPS', Settings.TPS);
 			Settings['Longest Tick'] = responses[1];
-			world.setDynamicProperty('Debug Longest Tick', Settings['Longest Tick']);
+			world.setDynamicProperty('DBGTLS Longest Tick', Settings['Longest Tick']);
 			Settings['Smart Longest Tick'] = responses[2];
-			world.setDynamicProperty('Debug Smart Longest Tick', Settings['Smart Longest Tick']);
+			world.setDynamicProperty('DBGTLS Smart Longest Tick', Settings['Smart Longest Tick']);
 			Settings['Script Uptime'] = responses[3];
-			world.setDynamicProperty('Debug Script Uptime', Settings['Script Uptime']);
+			world.setDynamicProperty('DBGTLS Script Uptime', Settings['Script Uptime']);
 		})
 }
 
@@ -199,9 +189,9 @@ function entitySettings(player: Player) {
 			if (r.canceled) return;
 			const responses = r.formValues;
 			Settings['Entity Counter'] = responses[0];
-			world.setDynamicProperty('Debug Entity Counter', Settings['Entity Counter']);
+			world.setDynamicProperty('DBGTLS Entity Counter', Settings['Entity Counter']);
 			Settings['Entity Change'] = responses[1];
-			world.setDynamicProperty('Debug Entity Change', Settings['Entity Change']);
+			world.setDynamicProperty('DBGTLS Entity Change', Settings['Entity Change']);
 		})
 }
 function configSettings(player: Player) {
@@ -213,8 +203,8 @@ function configSettings(player: Player) {
 			if (r.canceled) return;
 			const responses = r.formValues;
 			Settings['Settings Item'] = responses[0];
-			world.setDynamicProperty('Debug Settings Item', Settings['Settings Item']);
+			world.setDynamicProperty('DBGTLS Settings Item', Settings['Settings Item']);
 			Settings['Command Prefix'] = responses[1];
-			world.setDynamicProperty('Debug Command Prefix', Settings['Command Prefix']);
+			world.setDynamicProperty('DBGTLS Command Prefix', Settings['Command Prefix']);
 		})
 }

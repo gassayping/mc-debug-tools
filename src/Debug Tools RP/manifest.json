@@ -1,0 +1,29 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "Debug Tools",
+		"description": "Debug Tools resource pack for better creator log in game.",
+		"uuid": "bf001c28-ec20-4ede-804d-1693858372ef",
+		"version": [
+			1,
+			1,
+			0
+		],
+		"min_engine_version": [
+			1,
+			20,
+			0
+		]
+	},
+	"modules": [
+		{
+			"type": "resources",
+			"uuid": "fb0b0d5d-b176-4f03-8df4-9a2c9738ecd9",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	]
+}

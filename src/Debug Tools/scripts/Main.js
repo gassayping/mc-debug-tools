@@ -76,6 +76,12 @@ world.beforeEvents.chatSend.subscribe(m => {
 			const response = (tags.length > 0) ? `Your tags: ${tags.join(', ')}` : 'You have no tags.';
 			player.sendMessage(response);
 			break;
+		case 'help':
+			m.cancel = true;
+			player.sendMessage('Debug Tools - Created by Gassayping on MCPEDL and Discord');
+			player.sendMessage('Gamemode Commands - Set your gamemode to:\n   gms - Survival\n   gmc - Creative\n   gmsp - Spectator\n   gma - Adventure');
+			player.sendMessage('Miscellanious Commands:\n   tags - Lists your tags\n   tools - Gives the item to open the menu\n');
+			player.sendMessage(`Current command prefix: ${Settings['Command Prefix']}\nMenu Item: ${Settings['Settings Item']}`);
 		default: break;
 	}
 });

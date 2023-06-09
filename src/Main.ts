@@ -33,7 +33,7 @@ world.afterEvents.worldInitialize.subscribe(eventData => {
 		.defineString('DBGTLS Settings Item Prefix', 36)
 		.defineString('DBGTLS Command Prefix', 2);
 	eventData.propertyRegistry.registerWorldDynamicProperties(settingsSave);
-	if (!world.getDynamicProperty('DBGTLS Initialized')) {
+	if (world.getDynamicProperty('DBGTLS Initialized')) {
 		world.setDynamicProperty('DBGTLS Initialized', true);
 		for (const setting of Object.getOwnPropertyNames(Settings)) {
 			world.setDynamicProperty(`DBGTLS ${setting}`, Settings[setting]);
@@ -207,10 +207,10 @@ function configSettings(player: Player) {
 		.textField('Custom Command Prefix', 'eg: .', Settings['Command Prefix'])
 		.show(player).then(r => {
 			if (r.canceled) return;
-			const responses = r.formValues;
-			Settings['Settings Item'] = responses[0];
+			const responses = r.formValues as string[];
+			responses[0] ? Settings['Settings Item'] = responses[0] : {};
 			world.setDynamicProperty('DBGTLS Settings Item', Settings['Settings Item']);
-			Settings['Command Prefix'] = responses[1];
+			(responses[1] && responses[1].length < 2) ? Settings['Command Prefix'] = responses[1] : {};
 			world.setDynamicProperty('DBGTLS Command Prefix', Settings['Command Prefix']);
 		})
 }

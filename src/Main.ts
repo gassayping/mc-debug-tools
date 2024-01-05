@@ -1,6 +1,6 @@
 //@ts-expect-error
-import { Settings } from './Config.js';
-import { world, DynamicPropertiesDefinition, system, ItemStack, Player } from '@minecraft/server';
+import { Settings } from './Config';
+import { world, system, ItemStack, Player } from '@minecraft/server';
 import { ActionFormData, ActionFormResponse, ModalFormData } from '@minecraft/server-ui';
 
 console.warn('___Scripts and functions reloaded!___');
@@ -20,30 +20,16 @@ const entityChange = {
 	timeout: 20
 };
 
-world.afterEvents.worldInitialize.subscribe(eventData => {
-	const settingsSave = new DynamicPropertiesDefinition()
-		.defineBoolean('DBGTLS Initialized')
-		.defineBoolean('DBGTLS Longest Tick')
-		.defineBoolean('DBGTLS TPS')
-		.defineBoolean('DBGTLS Smart Longest Tick')
-		.defineBoolean('DBGTLS Entity Counter')
-		.defineBoolean('DBGTLS Entity Change')
-		.defineBoolean('DBGTLS Script Uptime')
-		.defineString('DBGTLS Settings Item', 36)
-		.defineString('DBGTLS Settings Item Prefix', 36)
-		.defineString('DBGTLS Command Prefix', 2);
-	eventData.propertyRegistry.registerWorldDynamicProperties(settingsSave);
-	if (!world.getDynamicProperty('DBGTLS Initialized')) {
-		world.setDynamicProperty('DBGTLS Initialized', true);
-		for (const setting of Object.getOwnPropertyNames(Settings)) {
-			world.setDynamicProperty(`DBGTLS ${setting}`, Settings[setting]);
-		}
-	} else {
-		for (const setting of Object.getOwnPropertyNames(Settings)) {
-			Settings[setting] = world.getDynamicProperty(`DBGTLS ${setting}`);
-		}
+if (!world.getDynamicProperty('DBGTLS Initialized')) {
+	world.setDynamicProperty('DBGTLS Initialized', true);
+	for (const setting of Object.getOwnPropertyNames(Settings)) {
+		world.setDynamicProperty(`DBGTLS ${setting}`, Settings[setting]);
 	}
-})
+} else {
+	for (const setting of Object.getOwnPropertyNames(Settings)) {
+		Settings[setting] = world.getDynamicProperty(`DBGTLS ${setting}`);
+	}
+}
 
 world.beforeEvents.chatSend.subscribe(m => {
 	const player = m.sender
